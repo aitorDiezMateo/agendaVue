@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="AgendaVue - Aplicación de agenda de contactos desarrollada con Vue.js. Gestiona tus contactos de forma sencilla y eficiente.">
+    <meta name="author" content="e-ghost 2019">
+    <meta name="keywords" content="agenda, contactos, vue, vuejs, spa, aplicación web">
+
+    <title>AgendaVue - Agenda de Contactos en Vue.js</title>
+    
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AgendaVue",
+      "description": "Aplicación de agenda de contactos desarrollada con Vue.js",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "e-ghost"
+      },
+      "datePublished": "2019",
+      "inLanguage": "es",
+      "featureList": [
+        "Gestión de contactos",
+        "Añadir contactos",
+        "Eliminar contactos",
+        "Persistencia local"
+      ]
+    }
+    </script>
+
+    <!-- Ensure Twitter widgets have a chance to parse embeds if available -->
+    <script>
+    if (window.twttr && twttr.widgets && typeof twttr.widgets.load === 'function') {
+        try { twttr.widgets.load(); } catch(e) { /* ignore */ }
+    }
+    </script>
+
+    <!-- X (Twitter) widgets JavaScript (enhances follow/share buttons) -->
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+    <!-- Bootstrap Core CSS - Uses Bootswatch Flatly Theme: http://bootswatch.com/flatly/ -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/freelancer.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Usar DBPEDIA o VOCAB o SCHEMA.ORG para añadir habilidades microsemanticas-->
+
+</head>
+
+<body id="page-top" class="index">
+    <div id="fb-root"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Cambiar navegación</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#page-top">AgendaVue</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="page-scroll">
+                        <a href="#contactos">Contactos</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#nuevo">Añadir contacto</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#about">Acerca de...</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <!-- Header con RDFa -->
+    <header vocab="https://schema.org/" typeof="WebApplication">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="intro-text">
+                        <span class="name" property="name">AgendaVue</span>
+                        <hr class="star-light">
+                        <span class="skills" property="description">Agenda básica en Vue</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Vue App container -->
+    <div id="app">
+    
+    <!-- Contactos Grid Section con RDFa -->
+    <section id="contactos" vocab="https://schema.org/" typeof="ItemList">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 property="name">Contactos</h2>
+                    <hr class="star-primary">
+                </div>
+            </div>
+            <div property="itemListElement" typeof="ListItem">
+                <!-- Mostrar contactos si existen -->
+                <div v-if="contactos.length > 0">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <h4>Nombre</h4>
+                        </div>
+                        <div class="col-xs-4">
+                            <h4>Email</h4>
+                        </div>
+                        <div class="col-xs-3">
+                            <h4>Teléfono</h4>
+                        </div>
+                    </div>
+                    <!-- Iterar sobre los contactos con Microdata -->
+                    <div class="row" v-for="(contacto, index) in contactos" :key="index" style="margin-bottom: 10px;" 
+                         itemscope itemtype="https://schema.org/Person">
+                        <div class="col-xs-4">
+                            <p itemprop="name">{{ contacto.nombre }}</p>
+                        </div>
+                        <div class="col-xs-4">
+                            <p itemprop="email">{{ contacto.email }}</p>
+                        </div>
+                        <div class="col-xs-3">
+                            <p itemprop="telephone">{{ contacto.telefono }}</p>
+                        </div>
+                        <div class="col-xs-1">
+                            <button @click="eliminarContacto(index)" class="btn btn-danger btn-sm" aria-label="Eliminar contacto" title="Eliminar contacto">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mensaje cuando no hay contactos -->
+                <div v-else>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <p>No se ha encontrado ningún contacto.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Añadir nuevo Section con RDFa -->
+    <section id="nuevo" vocab="https://schema.org/" typeof="Person">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Añadir contacto</h2>
+                    <hr class="star-primary">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <!-- Formulario Vue con RDFa -->
+                    <form @submit.prevent="agregarContacto">
+                        <div class="row control-group">
+                            <div class="form-group col-xs-12 floating-label-form-group controls">
+                                <label property="name">Nombre</label>
+                                <input type="text" class="form-control" placeholder="Nombre" v-model="nuevoContacto.nombre" required property="givenName">
+                                <p class="help-block text-danger"></p>
+                            </div>
+                        </div>
+                        <div class="row control-group">
+                            <div class="form-group col-xs-12 floating-label-form-group controls">
+                                <label property="email">Email</label>
+                                <input type="email" class="form-control" placeholder="Email" v-model="nuevoContacto.email" required property="email">
+                                <p class="help-block text-danger"></p>
+                            </div>
+                        </div>
+                        <div class="row control-group">
+                            <div class="form-group col-xs-12 floating-label-form-group controls">
+                                <label property="telephone">Teléfono</label>
+                                <input type="tel" class="form-control" placeholder="Número de teléfono" v-model="nuevoContacto.telefono" required property="telephone">
+                                <p class="help-block text-danger"></p>
+                            </div>
+                        </div>
+                        <br>
+                        <!-- Mensaje de éxito -->
+                        <div v-if="mensajeExito" class="alert alert-success">
+                            {{ mensajeExito }}
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-xs-12">
+                                <button type="submit" class="btn btn-success btn-lg">Añadir</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    </div>
+    <!-- End Vue App container -->
+
+    <!-- About Section con RDFa -->
+    <section class="success" id="about" vocab="https://schema.org/" typeof="AboutPage">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 property="name">Acerca de...</h2>
+                    <hr class="star-light">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <p property="description">AgendaVue es un proyecto simple en VueJS.</p>
+                    <div style="margin-top:20px; display:flex; justify-content:center;">
+                        <!-- Embedded X/Twitter post (sample). The widgets.js script will render this into an embedded Tweet. -->
+                        <blockquote class="twitter-tweet" data-lang="en" style="margin:0;">
+                            <p lang="en" dir="ltr">Just setting up my twttr</p>&mdash;
+                            <a href="https://twitter.com/jack/status/20">March 21, 2006</a>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer con RDFa -->
+    <footer class="text-center" vocab="https://schema.org/" typeof="WPFooter">
+        <div class="footer-above">
+            <div class="container">
+            </div>
+        </div>
+        <div class="footer-below">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12" property="copyrightHolder" typeof="Person">
+                        Copyleft &copy; <span property="name">e-ghost</span> <span property="copyrightYear">2019</span>
+                    </div>
+                    <div class="col-lg-12" style="margin-top:10px;">
+                        <!-- X (Twitter) Follow button (rounded/large style). -->
+                            <a href="https://twitter.com/aitoorrr_13"
+                           class="twitter-follow-button"
+                           data-show-count="false"
+                           data-size="large"
+                           data-dnt="true"
+                           aria-label="Follow @aitoorrr_13"></a>
+
+                        <!-- Facebook Share button (uses FB SDK). Will share current page URL. -->
+                        <div class="fb-share-button" style="display:inline-block;margin-left:10px;"
+                             data-href=""
+                             data-layout="button"
+                             data-size="large">
+                            <a target="_blank" class="fb-xfbml-parse-ignore" href="">Compartir</a>
+                        </div>
+
+                        <script>
+                        // Set share URL to current page before FB SDK parses XFBML
+                        (function(){
+                            var href = window.location.href;
+                            var fbShare = document.querySelector('.fb-share-button');
+                            if(fbShare){
+                                fbShare.setAttribute('data-href', href);
+                                var a = fbShare.querySelector('a.fb-xfbml-parse-ignore');
+                                if(a) a.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(href);
+                            }
+                        })();
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+    <div class="scroll-top page-scroll visible-xs visible-sm">
+        <a class="btn btn-primary" href="#page-top" aria-label="Volver arriba" title="Volver arriba">
+            <i class="fa fa-chevron-up"></i>
+        </a>
+    </div>
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="js/classie.js"></script>
+    <script src="js/cbpAnimatedHeader.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="js/freelancer.js"></script>
+    
+    <!-- Vue -->
+    <script src="js/vue.js"></script>
+    
+    <!-- Vue App -->
+    <script>
+        // Crear la instancia de Vue
+        new Vue({
+            el: '#app',
+            data: {
+                // Array de contactos
+                contactos: [
+                    {
+                        nombre: 'John Doe',
+                        email: 'john.doe@deusto.es',
+                        telefono: '555555555'
+                    },
+                    {
+                        nombre: 'Jane Smith',
+                        email: 'jane.smith@deusto.es',
+                        telefono: '666666666'
+                    }
+                ],
+                // Objeto para el nuevo contacto
+                nuevoContacto: {
+                    nombre: '',
+                    email: '',
+                    telefono: ''
+                },
+                // Mensaje de éxito
+                mensajeExito: ''
+            },
+            methods: {
+                // Método para agregar un nuevo contacto
+                agregarContacto: function() {
+                    // Validar que los campos no estén vacíos
+                    if (this.nuevoContacto.nombre && this.nuevoContacto.email && this.nuevoContacto.telefono) {
+                        // Agregar el contacto al array
+                        this.contactos.push({
+                            nombre: this.nuevoContacto.nombre,
+                            email: this.nuevoContacto.email,
+                            telefono: this.nuevoContacto.telefono
+                        });
+                        
+                        // Limpiar el formulario
+                        this.nuevoContacto.nombre = '';
+                        this.nuevoContacto.email = '';
+                        this.nuevoContacto.telefono = '';
+                        
+                        // Mostrar mensaje de éxito
+                        this.mensajeExito = '¡Contacto añadido correctamente!';
+                        
+                        // Ocultar el mensaje después de 3 segundos
+                        setTimeout(() => {
+                            this.mensajeExito = '';
+                        }, 3000);
+                        
+                        // Guardar en localStorage
+                        this.guardarEnLocalStorage();
+                    }
+                },
+                // Método para eliminar un contacto
+                eliminarContacto: function(index) {
+                    if (confirm('¿Estás seguro de que quieres eliminar este contacto?')) {
+                        this.contactos.splice(index, 1);
+                        this.guardarEnLocalStorage();
+                    }
+                },
+                // Método para guardar en localStorage
+                guardarEnLocalStorage: function() {
+                    localStorage.setItem('agendaContactos', JSON.stringify(this.contactos));
+                },
+                // Método para cargar desde localStorage
+                cargarDeLocalStorage: function() {
+                    const contactosGuardados = localStorage.getItem('agendaContactos');
+                    if (contactosGuardados) {
+                        this.contactos = JSON.parse(contactosGuardados);
+                    }
+                }
+            },
+            // Cargar contactos al iniciar la aplicación
+            mounted: function() {
+                this.cargarDeLocalStorage();
+            }
+        });
+    </script>
+
+</body>
+
+<!-- Load Facebook SDK for JavaScript (XFBML) -->
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v17.0"></script>
+
+</html>
