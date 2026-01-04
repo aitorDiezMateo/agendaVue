@@ -49,7 +49,7 @@
     </script>
 
     <!-- X (Twitter) widgets JavaScript (enhances follow/share buttons) -->
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script async src="https://platform.twitter.com/widgets.js"></script>
 
     <!-- Bootstrap Core CSS - Uses Bootswatch Flatly Theme: http://bootswatch.com/flatly/ -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -145,13 +145,13 @@
                 <div v-else-if="contactos.length > 0">
                     <div class="row">
                         <div class="col-xs-4">
-                            <h4>Nombre</h4>
+                            <h3>Nombre</h3>
                         </div>
                         <div class="col-xs-4">
-                            <h4>Email</h4>
+                            <h3>Email</h3>
                         </div>
                         <div class="col-xs-3">
-                            <h4>Teléfono</h4>
+                            <h3>Teléfono</h3>
                         </div>
                     </div>
                     <!-- Iterar sobre los contactos con Microdata -->
@@ -437,9 +437,9 @@
         });
     </script>
 
-</body>
+    <!-- Load Facebook SDK for JavaScript (XFBML) -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v17.0"></script>
 
-<!-- Load Facebook SDK for JavaScript (XFBML) -->
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v17.0"></script>
+</body>
 
 </html>
